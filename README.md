@@ -1,8 +1,8 @@
-## Writing my own text editor in C
+## Writing my own text editor in C (currently a work in progress)
 
 I'm following snaptoken's kilo tutorial ([link](https://viewsourcecode.org/snaptoken/kilo/index.html) to teach myself low level programming, file manipulation and UI rendering, all in ~1000 lines of pure C code.
 
-Main concepts covered - 
+Main concepts to be covered - 
 
 1. Terminal I/O, Raw mode
 	- disabling "canonical mode", and enabling "raw mode" to process text as it is typed and gaining direct and immediate control over keyboard input.
