@@ -1,6 +1,6 @@
 ## Writing my own text editor in C (currently a work in progress)
 
-I'm following snaptoken's kilo tutorial ([link](https://viewsourcecode.org/snaptoken/kilo/index.html))to teach myself low level programming, file manipulation and UI rendering, all in ~1000 lines of pure C code.
+I'm following snaptoken's kilo tutorial ([link](https://viewsourcecode.org/snaptoken/kilo/index.html)) to teach myself low level programming, file manipulation and UI rendering, all in ~1000 lines of pure C code.
 
 Main concepts to be covered - 
 
