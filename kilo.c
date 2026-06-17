@@ -166,6 +166,17 @@ int getWindowSize(int *rows, int *cols){
 	}
 }
 
+// row operations
+void editorAppendRow(char *s, size_t len) {
+	E.row = realloc(E.row, sizeof(editorRow) * (E.numrows + 1));
+	int at = E.numrows;
+	E.row[at].size = len;
+	E.row[at].chars = malloc(len + 1);
+	memcpy(E.row[at].chars, s, len);
+	E.row[at].chars[len] = '\0';
+	E.numrows++;
+}
+
 // file io
 
 void editorOpen(char *filename){
@@ -175,15 +186,9 @@ void editorOpen(char *filename){
 	char *line = NULL;
 	size_t linecapacity = 0;
 	ssize_t linelen;
-	linelen = getline(&line, &linecapacity, fp);
-	if(linelen != -1){
+	while ((linelen = getline(&line, &linecapacity, fp)) != -1){
 		while((linelen > 0) && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) linelen--;
-
-	E.row.size = linelen;
-	E.row.chars = malloc(linelen + 1);
-	memcpy(E.row.chars, line, linelen);
-	E.row.chars[linelen] = '\0';
-	E.numrows = 1;
+		editorAppendRow(line,linelen);
 	}
 	free(line);
 	fclose(fp);
@@ -220,7 +225,7 @@ void editorDrawRows(struct abuf *ab){
 			if(y == E.screenrows / 3){
 				char welcome[80];
 				
-				int welcomelen = snprintf(welcome, sizeof(welcome), "KILO EDTIOR - VERSION %s", KILO_VERSION);
+				int welcomelen = snprintf(welcome, sizeof(welcome), "KILO EDITOR - VERSION %s", KILO_VERSION);
 				
 				if(welcomelen > E.screencols) welcomelen = E.screencols;
 				int padding = (E.screencols - welcomelen) / 2;
@@ -228,23 +233,21 @@ void editorDrawRows(struct abuf *ab){
 				if(padding) {
 					abAppend(ab, "~", 1);
 					padding --;
-				}
-				
+				}	
 				while (padding--) abAppend(ab, " ", 1);
 				abAppend(ab, welcome, welcomelen);
-			
 			} else {
 			abAppend(ab, "~", 1);
 			}
-
-			abAppend(ab,"\x1b[K", 3);
-			if(y < E.screenrows -1){
-				abAppend(ab, "\r\n", 2);
-			}
 		} else {
-			int len = E.row.size;
+			int len = E.row[y].size;
 			if(len > E.screencols) len = E.screencols;
-			abAppend(ab, E.row.chars, len);
+			abAppend(ab, E.row[y].chars, len);
+		}
+
+		abAppend(ab,"\x1b[K", 3);
+		if(y < E.screenrows -1){
+			abAppend(ab, "\r\n", 2);
 		}
 	}
 }
@@ -324,7 +327,8 @@ void editorProcessKeypress(){
 void initEditor(){
 	E.cx = 0;
 	E.cy = 0;
-	E.numrows = NULL;
+	E.numrows = 0;
+	E.row = NULL;
 
 	if(getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
@@ -333,7 +337,7 @@ int main(int argc, char *argv[]){
 	enableRawMode();
 	initEditor();
 	if(argc >= 2){
-		editorOpen(argv[2]);
+		editorOpen(argv[1]);
 	}
 	
 	while(1){
